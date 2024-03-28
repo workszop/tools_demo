@@ -1,7 +1,4 @@
-pyautogui
-streamlit 
-gradio
-organize-tool 
-pandas 
-keyboard 
-pysimplegui
+requests
+openai
+anthropic
+cohere
