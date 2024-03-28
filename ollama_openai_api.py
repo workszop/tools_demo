@@ -11,6 +11,8 @@ prompt = input('how can I help you?\n')
 
 response = client.chat.completions.create(
   model="tinyllama",
+  max_tokens=400,
+  temperature=1,
   messages=[
     {"role": "system", "content": "You are a helpful assistant."},
     {"role": "user", "content": prompt},
