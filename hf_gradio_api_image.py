@@ -3,12 +3,13 @@ from gradio_client import Client
 
 prompt = input('enter your image prompt:\n')
 
-client = Client("radames/Real-Time-Text-to-Image-SDXL-Lightning")
+client = Client("ByteDance/SDXL-Lightning")
 result = client.predict(
-		prompt,	# str in 'parameter_5' Textbox component
-		0,	# float (numeric value between 0 and 12013012031030)in'Seed' Slider component
-		api_name="/predict_1"
+		prompt,	# str  in 'Enter your prompt (English)' Textbox component
+		"4-Step",	# Literal['1-Step', '2-Step', '4-Step', '8-Step']  in 'Select inference steps' Dropdown component
+		api_name="/generate_image"
 )
+
 print(result)
 img = Image.open(result)
 img.show()
