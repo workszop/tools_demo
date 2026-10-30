@@ -239,7 +239,7 @@ footer { border-top: 1px solid var(--line); padding-block: 22px 32px; color: var
       <a class="card" href="#kredyty"><span class="ord">Lekcja 6</span><h3>Kredyty</h3><p>Ile naprawdę kosztuje pożyczka, czym jest RRSO i dlaczego raty rosną.</p></a>
     </div>
     <div class="quizband">
-      <div><h3>Sprawdź się w quizie</h3><p>12 pytań, każde z wyjaśnieniem. Najlepiej po przejściu lekcji.</p></div>
+      <div><h3>Sprawdź się w quizie</h3><p>14 pytań, każde z wyjaśnieniem. Najlepiej po przejściu lekcji.</p></div>
       <a class="cta" href="#quiz">Do quizu</a>
     </div>
   </div>
@@ -407,9 +407,16 @@ footer { border-top: 1px solid var(--line); padding-block: 22px 32px; color: var
           <p>Reguła 72: podziel 72 przez oprocentowanie, a dowiesz się, po ilu latach pieniądze się podwoją. Przy 6% to około 12 lat.</p>
         </section>
         <section>
+          <h3>Jak często dopisywane są odsetki?</h3>
+          <p>Bank może dopisywać odsetki codziennie, co miesiąc, co kwartał, raz w roku albo dopiero na koniec lokaty. To jest <strong>częstotliwość kapitalizacji</strong>. Im częściej odsetki trafiają na konto, tym szybciej same zaczynają zarabiać.</p>
+          <p>Dlatego oprócz oprocentowania z reklamy (<strong>nominalnego</strong>) liczy się oprocentowanie <strong>efektywne</strong>, czyli ile naprawdę zarobisz w ciągu roku.</p>
+          <div class="formula">efektywne = (1 + stopa ÷ k)<sup>k</sup> − 1<br>k = ile razy w roku dopisuje się odsetki</div>
+          <p>Przykład: 6% z kapitalizacją miesięczną to naprawdę około 6,17% rocznie. Różnica rośnie razem z oprocentowaniem i liczbą lat.</p>
+        </section>
+        <section>
           <h3>Dwa haczyki</h3>
           <ul>
-            <li><strong>Podatek Belki:</strong> od zysków z lokat, obligacji i akcji państwo pobiera 19%.</li>
+            <li><strong>Podatek Belki:</strong> od zysków z lokat, obligacji i akcji państwo pobiera 19%. Na lokacie bank pobiera go przy każdym dopisaniu odsetek, a w obligacjach EDO dopiero przy wykupie. To drugie jest korzystniejsze: do końca procentuje cała kwota, łącznie z „przyszłym podatkiem”.</li>
             <li><strong>Inflacja:</strong> liczy się nie to, ile złotych masz, ale co możesz za nie kupić. Lokata na 4% przy inflacji 5% realnie traci.</li>
           </ul>
         </section>
@@ -427,17 +434,43 @@ footer { border-top: 1px solid var(--line); padding-block: 22px 32px; color: var
             <div class="ctl"><label for="sv-rate">Oprocentowanie rocznie</label><output id="sv-rate-o"></output><input type="range" id="sv-rate" min="0" max="12" step="0.25" value="5" data-out="pct2"></div>
             <div class="ctl"><label for="sv-years">Przez ile lat</label><output id="sv-years-o"></output><input type="range" id="sv-years" min="1" max="50" step="1" value="25" data-out="yrs"></div>
             <div class="ctl"><label for="sv-inf">Inflacja rocznie</label><output id="sv-inf-o"></output><input type="range" id="sv-inf" min="0" max="10" step="0.5" value="3" data-out="pct"></div>
+            <div class="ctl"><label for="sv-cap">Kapitalizacja odsetek</label><span class="val"></span>
+              <select id="sv-cap">
+                <option value="365">codzienna</option>
+                <option value="12" selected>miesięczna</option>
+                <option value="4">kwartalna</option>
+                <option value="1">roczna</option>
+                <option value="0">brak, odsetki dopiero na koniec</option>
+              </select></div>
             <label class="check"><input type="checkbox" id="sv-tax" checked> Uwzględnij podatek Belki (19%)</label>
+            <div class="ctl" id="sv-taxmode-row"><label for="sv-taxmode">Kiedy płacisz podatek</label><span class="val"></span>
+              <select id="sv-taxmode">
+                <option value="cap">przy każdym dopisaniu odsetek (lokata)</option>
+                <option value="end">raz, na samym końcu (obligacje EDO)</option>
+              </select></div>
           </div>
           <div class="stats">
             <div class="stat"><span class="k">Wpłacisz</span><span class="v" id="sv-paid">–</span></div>
             <div class="stat good"><span class="k">Odsetki dołożą</span><span class="v" id="sv-int">–</span></div>
-            <div class="stat acc"><span class="k">Będziesz mieć</span><span class="v" id="sv-bal">–</span></div>
+            <div class="stat acc"><span class="k">Będziesz mieć</span><span class="v" id="sv-bal">–</span><span class="s" id="sv-bal-s"></span></div>
             <div class="stat"><span class="k">W dzisiejszych złotych</span><span class="v" id="sv-real">–</span><span class="s">po uwzględnieniu inflacji</span></div>
           </div>
           <div class="legend"></div>
           <div class="chart"><canvas id="ch-sv" aria-label="Wykres oszczędności w czasie"></canvas></div>
           <p class="insight" id="sv-early"></p>
+        </div>
+
+        <div class="lab" id="lab-cap">
+          <div><h3>Ta sama stopa, różna kapitalizacja</h3><p class="task">Liczby z kalkulatora wyżej, policzone dla każdej częstotliwości dopisywania odsetek. Zmień oprocentowanie albo liczbę lat i zobacz, kiedy różnica robi się duża.</p></div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Kapitalizacja</th><th class="r">Oprocentowanie efektywne</th><th class="r">Na koniec</th><th class="r">Więcej niż bez kapitalizacji</th></tr></thead>
+              <tbody id="cap-tbl"></tbody>
+            </table>
+          </div>
+          <div class="legend"></div>
+          <div class="chart"><canvas id="ch-cap" aria-label="Wykres porównania częstotliwości kapitalizacji"></canvas></div>
+          <p class="insight" id="cap-tax"></p>
         </div>
       </div>
     </div>
@@ -484,6 +517,7 @@ footer { border-top: 1px solid var(--line); padding-block: 22px 32px; color: var
             <li><strong>Wcześniejszy wykup</strong> jest możliwy, ale kosztuje niewielką opłatę, potrącaną z odsetek.</li>
             <li>Od zysku płacisz <strong>podatek Belki</strong> (19%), chyba że kupujesz w ramach konta IKE.</li>
             <li>Obligacje <strong>stałoprocentowe</strong> wygrywają, gdy inflacja spada. <strong>Indeksowane</strong> chronią, gdy inflacja niespodziewanie rośnie.</li>
+            <li><strong>Kapitalizacja czy wypłata?</strong> W EDO (i TOS) odsetki są co roku doliczane do obligacji i dalej procentują, a podatek płacisz raz, przy wykupie. W COI dostajesz odsetki co roku na konto, a podatek pobierany jest od każdej wypłaty. COI daje regularny dochód, EDO w długim terminie zarabia więcej.</li>
           </ul>
         </section>
         <div class="fact">
@@ -562,8 +596,9 @@ footer { border-top: 1px solid var(--line); padding-block: 22px 32px; color: var
           <h3>Jak się na nich zarabia?</h3>
           <ul>
             <li><strong>Wzrost ceny:</strong> kupujesz taniej, sprzedajesz drożej.</li>
-            <li><strong>Dywidenda:</strong> część zysku, którą firma wypłaca akcjonariuszom.</li>
+            <li><strong>Dywidenda:</strong> część zysku, którą firma wypłaca akcjonariuszom, zwykle raz w roku. Od dywidendy płacisz 19% podatku.</li>
           </ul>
+          <p>Dywidendę możesz wydać albo <strong>reinwestować</strong>, czyli kupić za nią kolejne akcje. Te nowe akcje też płacą dywidendy, więc działa ten sam procent składany co na lokacie. W długim terminie reinwestowane dywidendy to duża część całego zysku z akcji.</p>
         </section>
         <section>
           <h3>Dlaczego ceny skaczą?</h3>
@@ -579,13 +614,17 @@ footer { border-top: 1px solid var(--line); padding-block: 22px 32px; color: var
           </ul>
         </section>
         <div class="fact">
+          <span class="tag">Ciekawostka</span>
+          <p>Indeks WIG20 pokazuje tylko ceny akcji. Jego „bliźniak” WIG20TR liczy też reinwestowane dywidendy. Po latach różnica między nimi jest bardzo wyraźna.</p>
+        </div>
+        <div class="fact">
           <span class="tag">Ważne</span>
           <p>Akcje to nie loteria, ale też nie lokata. Inwestuj tylko pieniądze, których nie będziesz potrzebować przez wiele lat. Rachunek maklerski przed 18. rokiem życia zakłada się razem z rodzicem.</p>
         </div>
       </div>
       <div class="labs">
         <div class="lab" id="lab-st">
-          <div><h3>Jedna firma czy cały koszyk?</h3><p class="task">Inwestujesz 10 000 zł. Porównaj akcje jednej firmy, koszyk 20 firm (jak fundusz ETF) i lokatę 3%. Każde losowanie to inna możliwa historia rynku.</p></div>
+          <div><h3>Jedna firma czy cały koszyk?</h3><p class="task">Inwestujesz 10 000 zł. Porównaj akcje jednej firmy, koszyk 20 firm (jak fundusz ETF) i lokatę 3%. Każde losowanie to inna możliwa historia rynku. Wyniki zakładają, że dywidendy są reinwestowane.</p></div>
           <div class="controls">
             <div class="ctl"><label for="st-years">Horyzont inwestycji</label><output id="st-years-o"></output><input type="range" id="st-years" min="1" max="30" step="1" value="15" data-out="yrs"></div>
           </div>
@@ -593,6 +632,19 @@ footer { border-top: 1px solid var(--line); padding-block: 22px 32px; color: var
           <div class="legend"></div>
           <div class="chart tall"><canvas id="ch-st" aria-label="Wykres symulacji wartości inwestycji"></canvas></div>
           <div class="stats" id="st-stats"></div>
+        </div>
+
+        <div class="lab" id="lab-dv">
+          <div><h3>Dywidendy: reinwestować czy wydawać?</h3><p class="task">Masz 10 000 zł w koszyku firm, które co roku wypłacają część zysku. Ta sama historia rynku, dwie decyzje: za dywidendy dokupujesz akcje albo je wydajesz. Dywidendy są już pomniejszone o 19% podatku.</p></div>
+          <div class="controls">
+            <div class="ctl"><label for="dv-years">Horyzont</label><output id="dv-years-o"></output><input type="range" id="dv-years" min="5" max="40" step="1" value="30" data-out="yrs"></div>
+            <div class="ctl"><label for="dv-yield">Stopa dywidendy rocznie</label><output id="dv-yield-o"></output><input type="range" id="dv-yield" min="0" max="6" step="0.25" value="3" data-out="pct2"></div>
+          </div>
+          <div class="legend"></div>
+          <div class="chart tall"><canvas id="ch-dv" aria-label="Wykres: reinwestowanie dywidend a ich wydawanie"></canvas></div>
+          <div class="stats" id="dv-stats"></div>
+          <p class="insight" id="dv-insight"></p>
+          <p class="task">Średni zysk rynku w modelu to nadal około 7% rocznie. Im wyższa dywidenda, tym mniejsza część zysku pochodzi ze wzrostu cen akcji.</p>
         </div>
 
         <div class="lab" id="lab-mc">
@@ -604,7 +656,7 @@ footer { border-top: 1px solid var(--line); padding-block: 22px 32px; color: var
             </table>
           </div>
           <p class="insight" id="mc-insight"></p>
-          <p class="task">To uproszczony model: średni wzrost rynku około 7% rocznie z dużymi wahaniami. Prawdziwy rynek bywa bardziej zaskakujący. Wyniki z przeszłości nie gwarantują przyszłych.</p>
+          <p class="task">To uproszczony model: średni zysk rynku około 7% rocznie (wzrost cen + reinwestowane dywidendy) z dużymi wahaniami. Prawdziwy rynek bywa bardziej zaskakujący. Wyniki z przeszłości nie gwarantują przyszłych.</p>
         </div>
       </div>
     </div>
@@ -1070,21 +1122,38 @@ $('#cb-go').addEventListener('click', gStep);
 $('#cb-reset').addEventListener('click', gReset);
 
 /* ================= PROCENT SKŁADANY ================= */
-function grow(P0, m, r, years, tax) {
-  let bal = P0, paid = P0; const B = [P0], W = [P0];
-  for (let y = 1; y <= years; y++) {
-    for (let k = 0; k < 12; k++) { bal += m; paid += m; const int = bal * r / 12; bal += tax ? int * 0.81 : int; }
-    B.push(bal); W.push(paid);
+// f = ile razy w roku dopisuje się odsetki (365, 12, 4, 1; 0 = dopiero na koniec)
+// mode = 'cap': podatek przy każdej kapitalizacji, 'end': raz, przy wypłacie
+function grow(P0, m, r, years, tax, f = 12, mode = 'cap') {
+  const T = tax && mode === 'cap' ? 0.81 : 1;
+  const per = f >= 12 ? 0 : f > 0 ? 12 / f : Infinity;
+  const mf = f >= 12 ? Math.pow(1 + r / f, f / 12) - 1 : 0;
+  let bal = P0, pend = 0, paid = P0; const B = [P0], W = [P0];
+  for (let mo = 1; mo <= years * 12; mo++) {
+    bal += m; paid += m;
+    if (f >= 12) bal += bal * mf * T;
+    else {
+      pend += bal * r / 12;                                   // odsetki naliczone, jeszcze niedopisane
+      if (per !== Infinity && mo % per === 0) { bal += pend * T; pend = 0; }
+    }
+    if (mo % 12 === 0) { B.push(bal + pend * T); W.push(paid); }
   }
+  bal += pend * T;
+  if (tax && mode === 'end') bal = paid + Math.max(0, bal - paid) * 0.81;
+  B[B.length - 1] = bal;
   return { bal, paid, B, W };
 }
+const CAPS = [[365, 'Codzienna'], [12, 'Miesięczna'], [4, 'Kwartalna'], [1, 'Roczna'], [0, 'Brak (odsetki na koniec)']];
 function updSav() {
   const P0 = val('sv-start'), m = val('sv-month'), r = val('sv-rate') / 100, n = val('sv-years'), inf = val('sv-inf') / 100, tax = $('#sv-tax').checked;
-  const res = grow(P0, m, r, n, tax);
+  const f = +$('#sv-cap').value, mode = $('#sv-taxmode').value;
+  $('#sv-taxmode-row').hidden = !tax;
+  const res = grow(P0, m, r, n, tax, f, mode);
   const R = res.B.map((v, y) => v / Math.pow(1 + inf, y));
   $('#sv-paid').textContent = zl(res.paid);
   $('#sv-int').textContent = zl(res.bal - res.paid);
   $('#sv-bal').textContent = zl(res.bal);
+  $('#sv-bal-s').textContent = tax ? 'po podatku' : 'bez podatku';
   $('#sv-real').textContent = zl(R[n]);
   setStat($('#sv-real').parentElement, R[n] < res.paid ? 'bad' : null);
   const labels = res.B.map((_, y) => y === 0 ? 'start' : y + ' ' + (n > 12 ? 'l.' : lat(y)));
@@ -1097,8 +1166,38 @@ function updSav() {
     ]
   });
   const mm = m || 100;
-  const a = grow(0, mm, r, 44, tax), b = grow(0, mm, r, 34, tax);
+  const a = grow(0, mm, r, 44, tax, f, mode), b = grow(0, mm, r, 34, tax, f, mode);
   $('#sv-early').innerHTML = `Odkładasz ${zl(mm)} miesięcznie na ${pc(r * 100, 2)} aż do 60. urodzin. Start w wieku <b>16 lat</b>: na koniec ${zl(a.bal)} (wpłacisz ${zl(a.paid)}). Start w wieku <b>26 lat</b>: ${zl(b.bal)} (wpłacisz ${zl(b.paid)}). Dziesięć lat różnicy kosztuje <b>${zl(a.bal - b.bal)}</b>, choć wpłaty różnią się tylko o ${zl(a.paid - b.paid)}.`;
+  updCap(P0, m, r, n, tax, f, mode);
+}
+function updCap(P0, m, r, n, tax, fSel, mode) {
+  const runs = CAPS.map(([f, name]) => ({ f, name, res: grow(P0, m, r, n, tax, f, mode) }));
+  const none = runs[runs.length - 1].res.bal;
+  const eff = (f) => f > 0 ? Math.pow(1 + r / f, f) - 1 : Math.pow(1 + r * n, 1 / n) - 1;
+  $('#cap-tbl').innerHTML = runs.map(({ f, name, res }) => {
+    const sel = f === fSel;
+    const e = pc(eff(f) * 100, 2) + (f === 0 ? ` <span class="pill warn">średnio przez ${n} ${lat(n)}</span>` : '');
+    return `<tr${sel ? ' style="font-weight:700"' : ''}><td>${name}${sel ? ' ← wybrana' : ''}</td><td class="r">${e}</td><td class="r">${zl(res.bal)}</td><td class="r">${f === 0 ? '–' : '+' + zl(res.bal - none)}</td></tr>`;
+  }).join('');
+  const L = runs[0].res.B.map((_, y) => y === 0 ? 'start' : y + ' ' + (n > 12 ? 'l.' : lat(y)));
+  chart($('#ch-cap'), {
+    labels: L, yFmt: (v) => zlShort(v) + ' zł', tipLabel: (k) => k === 0 ? 'start' : `po ${k} ${lat(k)}`,
+    series: [
+      { name: 'Codzienna', color: '--accent', data: runs[0].res.B, fmt: zl },
+      { name: 'Roczna', color: '--s2', data: runs[3].res.B, fmt: zl },
+      { name: 'Brak kapitalizacji', color: '--bad', data: runs[4].res.B, dash: true, fmt: zl },
+      { name: 'Same wpłaty', color: '--muted', data: runs[0].res.W, dash: true, fmt: zl }
+    ]
+  });
+  const d = runs[0].res.bal - runs[1].res.bal;
+  let txt = `Kapitalizacja codzienna i miesięczna różnią się tylko o ${zl(d)}, więc nie daj się nabrać na reklamę „odsetki codziennie!”. Najważniejsze, żeby odsetki w ogóle były dopisywane i dalej zarabiały: bez tego tracisz <b>${zl(runs[1].res.bal - none)}</b>.`;
+  if (tax) {
+    const c = grow(P0, m, r, n, true, fSel || 12, 'cap').bal, e = grow(P0, m, r, n, true, fSel || 12, 'end').bal;
+    txt += ` Moment płacenia podatku też ma znaczenie: podatek pobierany raz na końcu zamiast przy każdej kapitalizacji daje o <b>${zl(e - c)}</b> więcej, bo przez ${n} ${lat(n)} procentuje cała kwota.`;
+  } else {
+    txt += ' Włącz podatek Belki w kalkulatorze, żeby zobaczyć, jak ważne jest, kiedy się go płaci.';
+  }
+  $('#cap-tax').innerHTML = txt;
 }
 $('#lab-sv').addEventListener('input', updSav);
 $('#lab-sv').addEventListener('change', updSav);
@@ -1114,26 +1213,29 @@ function updBond() {
   $('#bd-custom-row').hidden = sc !== 'wlasna';
   const infl = sc === 'wlasna' ? Array(10).fill(val('bd-custom')) : SCEN[sc];
   const fixed = val('bd-fixed') / 100, first = val('bd-first') / 100, m = val('bd-margin') / 100;
-  let fx = K, ix = K, pr = K;
-  const L = ['start'], F = [K], I = [K], PR = [K], S = [K], rates = [];
+  let fx = K, ix = K, pr = K, paidOut = 0;
+  const L = ['start'], F = [K], I = [K], CI = [K], PR = [K], S = [K], rates = [];
   for (let y = 1; y <= n; y++) {
     const ri = y === 1 ? first : Math.max(0, infl[y - 2] / 100) + m;
     rates.push(ri);
     fx *= 1 + fixed; ix *= 1 + ri; pr *= 1 + infl[y - 1] / 100;
-    L.push(y + ' ' + (n > 6 ? 'l.' : lat(y))); F.push(fx); I.push(ix); PR.push(pr); S.push(K);
+    paidOut += K * ri * 0.81;                                // COI: odsetki od 100 zł za sztukę, wypłacane i opodatkowane co roku
+    L.push(y + ' ' + (n > 6 ? 'l.' : lat(y))); F.push(fx); I.push(ix); CI.push(K + paidOut); PR.push(pr); S.push(K);
   }
   chart($('#ch-bd'), {
     labels: L, yFmt: (v) => zlShort(v) + ' zł', zero: false,
     tipLabel: (k) => k === 0 ? 'start' : `po ${k} ${lat(k)} (inflacja w tym roku ${pc(infl[k - 1])}${k > 0 ? ', indeksowana: ' + pc(rates[k - 1] * 100, 2) : ''})`,
     series: [
       { name: 'Obligacja stałoprocentowa', color: '--accent', data: F, fmt: zl },
-      { name: 'Obligacja indeksowana inflacją', color: '--good', data: I, fmt: zl },
+      { name: 'Indeksowana, odsetki doliczane (jak EDO)', color: '--good', data: I, fmt: zl },
+      { name: 'Indeksowana, odsetki wypłacane (jak COI)', color: '--s4', data: CI, fmt: zl },
       { name: 'Gotówka w skarpecie', color: '--muted', data: S, fmt: zl },
       { name: 'Tyle trzeba, by kupić to samo co dziś', color: '--bad', data: PR, dash: true, fmt: zl }
     ]
   });
   const net = (v) => K + Math.max(0, v - K) * 0.81;
-  const rows = [['Stała', net(fx)], ['Indeksowana', net(ix)], ['Skarpeta', K]];
+  const nc = K + paidOut;
+  const rows = [['Stała', net(fx)], ['Jak EDO (kapitalizacja)', net(ix)], ['Jak COI (wypłata)', nc], ['Skarpeta', K]];
   $('#bd-stats').innerHTML = rows.map(([name, v]) => {
     const real = v * K / pr;
     const cls = real >= K ? 'good' : 'bad';
@@ -1143,7 +1245,10 @@ function updBond() {
   const win = Math.abs(nf_ - ni) < K * 0.005 ? 'Obie obligacje dały prawie to samo.' :
     nf_ > ni ? `Wygrywa obligacja <b>stała</b> (o ${zl(nf_ - ni)}). Inflacja była niższa, niż zakładał jej stały procent.` :
       `Wygrywa obligacja <b>indeksowana</b> (o ${zl(ni - nf_)}). Gdy inflacja rośnie, jej oprocentowanie rośnie razem z nią.`;
-  $('#bd-verdict').innerHTML = `${win} Gotówka w skarpecie straciła realnie <b>${pc((1 - K / pr) * 100, 0)}</b> wartości. Zauważ, że indeksowana reaguje z rocznym opóźnieniem: oprocentowanie na dany rok zależy od inflacji z roku poprzedniego.`;
+  const capTxt = n > 1
+    ? ` Ta sama obligacja indeksowana daje <b>${zl(ni - nc)}</b> więcej, gdy odsetki są doliczane (EDO), niż gdy są wypłacane i nie inwestujesz ich dalej (COI). To efekt kapitalizacji: odsetki zarabiają kolejne odsetki, a podatek płacisz dopiero na końcu.`
+    : ' Ustaw okres dłuższy niż rok, żeby zobaczyć różnicę między doliczaniem a wypłacaniem odsetek.';
+  $('#bd-verdict').innerHTML = `${win}${capTxt} Gotówka w skarpecie straciła realnie <b>${pc((1 - K / pr) * 100, 0)}</b> wartości. Indeksowane reagują z rocznym opóźnieniem: oprocentowanie na dany rok zależy od inflacji z roku poprzedniego.`;
 }
 $('#lab-bd').addEventListener('input', updBond);
 $('#lab-bd').addEventListener('change', updBond);
@@ -1210,6 +1315,39 @@ function updStocks() {
   const st = [['Jedna firma', r.one * K], ['Koszyk 20 firm', r.bask * K], ['Lokata 3%', D[months]]];
   $('#st-stats').innerHTML = st.map(([n, v]) => `<div class="stat ${v >= K ? 'good' : 'bad'}"><span class="k">${n}</span><span class="v">${zl(v)}</span><span class="s">${v >= K ? '+' : ''}${pc((v / K - 1) * 100, 0)}${r.one === 0 && n === 'Jedna firma' ? ', firma zbankrutowała' : ''}</span></div>`).join('');
 }
+// Dywidendy: całkowity zysk koszyka (ceny + dywidendy brutto) dzielimy na wzrost cen i wypłatę dywidendy
+function updDiv() {
+  const yrs = val('dv-years'), months = yrs * 12, d = val('dv-yield') / 100, K = 10000, NET = 0.81;
+  const path = simulate(mulberry32(seed ^ 0x5bd1e995), months, true).B;
+  let V = K, S = K, cash = 0;
+  const L = ['start'], RV = [K], SV = [K], SC = [K];
+  for (let k = 1; k <= months; k++) {
+    const p = (path[k] / path[k - 1]) / (1 + d / 12);       // sam wzrost ceny akcji
+    V *= p; V += V * d / 12 * NET;                          // dywidenda za nowe akcje
+    S *= p; cash += S * d / 12 * NET;                       // dywidenda na konto, wydana
+    L.push(k % 12 === 0 ? (k / 12) + ' l.' : ''); RV.push(V); SV.push(S); SC.push(S + cash);
+  }
+  chart($('#ch-dv'), {
+    labels: L, yFmt: (v) => zlShort(v) + ' zł',
+    tipLabel: (k) => k === 0 ? 'start' : `rok ${Math.floor(k / 12)}, miesiąc ${k % 12 + 1}`,
+    series: [
+      { name: 'Reinwestuję dywidendy', color: '--accent', data: RV, fmt: zl },
+      { name: 'Wydaję: wartość akcji', color: '--s2', data: SV, fmt: zl },
+      { name: 'Wydaję: akcje + suma wydanych dywidend', color: '--s4', data: SC, dash: true, fmt: zl }
+    ]
+  });
+  $('#dv-stats').innerHTML = [
+    ['Reinwestuję', zl(V), `dywidenda w ostatnim roku: ${zl(V * d * NET)}`, 'acc'],
+    ['Wydaję: akcje', zl(S), `dywidenda w ostatnim roku: ${zl(S * d * NET)}`, ''],
+    ['Wydane dywidendy', zl(cash), `łącznie przez ${yrs} ${lat(yrs)}`, '']
+  ].map(([k, v, s, c]) => `<div class="stat ${c}"><span class="k">${k}</span><span class="v">${v}</span><span class="s">${s}</span></div>`).join('');
+  const diff = V - (S + cash);
+  $('#dv-insight').innerHTML = d === 0
+    ? 'Przy zerowej dywidendzie oba wykresy są takie same: cały zysk pochodzi ze wzrostu cen. Przesuń suwak dywidendy w prawo.'
+    : `Wydając dywidendy, dostałeś po drodze ${zl(cash)} i masz akcje warte ${zl(S)}, razem ${zl(S + cash)}. Reinwestując, masz <b>${zl(V)}</b>, czyli o <b>${zl(diff)}</b> więcej. To procent składany: dokupione akcje płacą kolejne dywidendy. Po ${yrs} ${lat(yrs)} reinwestowany portfel wypłaca ${zl(V * d * NET)} dywidendy rocznie, a ten bez reinwestowania ${zl(S * d * NET)}.`;
+}
+$('#dv-years').addEventListener('input', updDiv);
+$('#dv-yield').addEventListener('input', updDiv);
 let mcTimer = null;
 function runMC() {
   const yrs = val('st-years'), months = yrs * 12, N = 1000, K = 10000;
@@ -1232,7 +1370,7 @@ function runMC() {
     'Sprawdź, jak zmienia się szansa na stratę, gdy wydłużysz horyzont do 20–30 lat albo skrócisz go do roku.';
 }
 $('#st-years').addEventListener('input', () => { updStocks(); clearTimeout(mcTimer); mcTimer = setTimeout(runMC, 180); });
-$('#st-roll').addEventListener('click', () => { seed = (Math.random() * 2 ** 31) | 0; updStocks(); });
+$('#st-roll').addEventListener('click', () => { seed = (Math.random() * 2 ** 31) | 0; updStocks(); updDiv(); });
 
 /* ================= KREDYTY ================= */
 const PRESETS = {
@@ -1349,6 +1487,12 @@ const QUIZ = [
   ['Czym jest procent składany?',
     ['Opłatą za prowadzenie konta', 'Naliczaniem odsetek także od wcześniej zarobionych odsetek', 'Podatkiem od zysków', 'Karą za spóźnioną ratę'], 1,
     'Odsetki dopisane do kapitału same zaczynają zarabiać. Dlatego oszczędności rosną jak kula śnieżna, im dłużej czekasz.'],
+  ['Dwie lokaty mają oprocentowanie 6% w skali roku. Pierwsza dopisuje odsetki co miesiąc, druga raz w roku. Która da więcej po roku?',
+    ['Ta z kapitalizacją miesięczną', 'Ta z kapitalizacją roczną', 'Obie tyle samo', 'Nie da się tego policzyć'], 0,
+    'Odsetki dopisane w styczniu zarabiają już w lutym. Przy kapitalizacji miesięcznej 6% nominalnie daje około 6,17% efektywnie.'],
+  ['Co daje reinwestowanie dywidend?',
+    ['Nic, dywidendy są zbyt małe, żeby miały znaczenie', 'Za dywidendy kupujesz kolejne akcje, które też płacą dywidendy, więc zysk rośnie jak kula śnieżna', 'Nie musisz płacić podatku od dywidend', 'Masz gwarancję, że cena akcji wzrośnie'], 1,
+    'To procent składany w wersji giełdowej. Po kilkudziesięciu latach reinwestowane dywidendy mogą odpowiadać za dużą część całego zysku z akcji.'],
   ['Ile wynosi w Polsce podatek od zysków z lokat, obligacji i akcji (tzw. podatek Belki)?',
     ['5%', '12%', '19%', '23%'], 2,
     'To 19% od zysku. Można go legalnie uniknąć, oszczędzając w ramach kont emerytalnych IKE.'],
@@ -1363,7 +1507,7 @@ function renderQuiz() {
     `<div class="q" data-q="${qi}"><h3>${qi + 1}. ${q}</h3><div class="opts">${opts.map((o, oi) => `<button type="button" data-o="${oi}">${o}</button>`).join('')}</div><p class="why" hidden></p></div>`).join('');
   updScore();
 }
-function updScore() { $('#qz-score').textContent = `Wynik: ${qOk} / ${qDone}` + (qDone === QUIZ.length ? ` · ${qOk >= 10 ? 'Mistrz finansów!' : qOk >= 7 ? 'Dobra robota!' : 'Wróć do lekcji i spróbuj jeszcze raz.'}` : ''); }
+function updScore() { $('#qz-score').textContent = `Wynik: ${qOk} / ${qDone}` + (qDone === QUIZ.length ? ` · ${qOk >= 12 ? 'Mistrz finansów!' : qOk >= 9 ? 'Dobra robota!' : 'Wróć do lekcji i spróbuj jeszcze raz.'}` : ''); }
 $('#qz-list').addEventListener('click', (e) => {
   const b = e.target.closest('button[data-o]'); if (!b) return;
   const card = b.closest('.q'); if (card.dataset.answered) return;
@@ -1394,7 +1538,7 @@ function route() {
 window.addEventListener('hashchange', route);
 
 /* ================= start ================= */
-updHero(); updInf(); drawHist(); gReset(); updSav(); updBond(); updSeesaw(); updStocks(); runMC(); updLoan(); renderQuiz();
+updHero(); updInf(); drawHist(); gReset(); updSav(); updBond(); updSeesaw(); updStocks(); updDiv(); runMC(); updLoan(); renderQuiz();
 route();
 })();
 </script>
